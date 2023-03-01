@@ -151,7 +151,7 @@ ietsi_hex <- hexSticker::sticker(
     # u_family             = "roboto_slab", 
     # 
     # # Save file
-    filename             = "../images/ietsi-redcap.png"
+    filename             = "../ietsi-redcap.png"
     
   )  
 
@@ -160,7 +160,7 @@ plot(ietsi_hex)
 
 
 ```{r}
-save_sticker("../images/ietsi-redcap-hex.png",
+save_sticker("../ietsi-redcap-hex.png",
              ietsi_hex,
              dpi         = 600)
 ```
@@ -169,11 +169,11 @@ save_sticker("../images/ietsi-redcap-hex.png",
 
 ```{r}
 # Extrayendo fondo
-logo <- image_read("../images/ietsi-redcap-hex.png")
+logo <- image_read("../ietsi-redcap-hex.png")
 
 logo %>% 
   image_transparent('white') %>% 
-  image_write("../images/ietsi-redcap-hexsticker-transparent.png", "png")
+  image_write("../ietsi-redcap-hexsticker-transparent.png", "png")
 ```
 
 ```{r}
