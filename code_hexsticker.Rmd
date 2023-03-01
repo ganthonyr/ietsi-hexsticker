@@ -1,0 +1,181 @@
+---
+title: "IETSI-REDCap_hexsticker"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+rm(list = ls(all.names = TRUE))
+gc()
+if (!require("pacman")) {install.packages("pacman")}
+p_unload("all") # Unloading all package except base
+library(pacman)
+p_load(
+  tidyverse, 
+  hexSticker, 
+  sysfonts, 
+  showtext, 
+  png, 
+  grid, 
+  patchwork, 
+  ggpubr, 
+  magick
+)
+# Other examples: 
+# https://github.com/GuangchuangYu/hexSticker 
+# UVic logo
+# https://www.uvic.ca/brand/look-feel/logo/index.php 
+# UVic colour
+# https://www.uvic.ca/brand/look-feel/colour/palette/index.php
+```
+
+## Configurar formato de letras
+
+```{r}
+## Loading Google fonts (http://www.google.com/fonts)
+font_add_google("Poiret One", "poiret")
+font_add_google("Raleway", "raleway")
+font_add_google("Roboto Slab", "roboto_slab")
+font_add_google("Gochi Hand", "gochi")
+## loading local font 
+font_add(family = "broadway", regular = "BROADW.TTF")
+font_add("trebuchet",
+         regular="C:\\Windows\\Fonts\\trebuc.ttf")
+font_add("gill",
+         regular="C:\\Windows\\Fonts\\GILSANUB.TTF")
+## Automatically use showtext to render text for future devices
+showtext_auto()
+```
+
+### Configurar colores
+
+```{r}
+uvic_blue      <- "#005493"    #RGB: 0-84-147
+uvic_yellow    <- "#F5AA1C"    #RGB: 245-170-28  
+uvic_red       <- "#C63527"    #RGB: 198-53-39
+uvic_blue_dark <- "#002754"  #RGB: 0-39-84
+uvic_white     <- "#ffffff" #RGB: 255-255-255
+uvic_golden    <- "#eecd24" #RGB: 238-205-36
+uvic_black     <- "#000000" #RGB: 0-0-0
+uvic_borde     <- "#5b5b5b"
+uvic_borde2    <- "#424242"
+borde3         <- "#20324B"
+borde4         <- "#363636"
+color_fondo     <- "#F8F9FA"
+url_color      <- uvic_yellow
+```
+
+## Quipu con fondo de aestethic de ggplot2
+
+```{r}
+#Importar quipu y guardarlo como objeto raster
+quipu <- readPNG("../images/logo_ietsi.png")
+quipu_raster <- rasterGrob(     #Para agregar el quipu solo
+  quipu, 
+  width = 0.4,
+  height = 0.4, 
+  x = 0.5, 
+  y = 0.6,
+  interpolate = T)
+```
+
+```{r}
+# Crear data simulada para fondo
+xpos <- 1:10
+ypos <- xpos**2
+  
+data_frame = data.frame(xpos = xpos,
+                        ypos = ypos)
+```
+
+```{r}
+# Crear fondo, traslaparlo con quipu y guardarlo como objeto ggplo2
+
+gg <- qplot(xpos, ypos, geom = "blank") + 
+  annotation_custom(quipu_raster, 
+                    xmin = -Inf, 
+                    xmax = Inf, 
+                    ymin = -Inf, 
+                    ymax = Inf) + 
+  scale_x_continuous(breaks = NULL, minor_breaks = NULL) +
+  scale_y_continuous(breaks = NULL, minor_breaks = NULL) +
+  theme(panel.background = element_rect(fill = "#EBEBEB"))
+
+plot(gg)
+```
+
+## Logo oficial
+
+```{r}
+ietsi_hex <- hexSticker::sticker(
+    ##Opciones de la imagen
+    subplot              = gg, #la imagen que usaremos
+    #s_x                  = 1.00, s_y = 1.25, #posición relativa x e y de la imagen, 1=centro
+    #s_width              = 1.55, #ancho de la imagen
+    #s_height             = 1.52, #alto de la imagen
+    
+    s_x                  = 0.9, 
+    s_y                  = 0.9, #posición relativa x e y de la imagen, 1=centro
+    s_width              = 2.8, #ancho de la imagen
+    s_height             = 2.4, #alto de la imagen
+    ##Opciones para el título
+    package              = "PFC 2023", #el nombre del logo
+    p_size               = 25, #Tamaño de la fuente
+    p_family             = "roboto_slab", #define fuente de letra
+    p_color              = uvic_black, #para color de fuente
+    p_x                  = 1, p_y = 0.55, #para posición del título
+    
+    ##Opciones generales
+    # filename           = "Logo2 .png", #fichero de salida
+    dpi                  = 600, #Resolución
+    
+    ##Opciones del spotlight
+    # spotlight            = F, #agregar un brillo como reflector 
+    # l_x                  = 1, #posición relativa
+    # l_y                  = 1.2, #posición relativa
+    # l_alpha              = 0.1, #Transparencia del spotlight
+    # l_width              = 5, #Amplitud del spotlight
+    # 
+    ##Fondo y borde
+    h_fill               = color_fondo, #color de fondo
+    h_color              = "#00376F", #color de borde del hex
+    h_size               = 1.2, #ancho de borde
+    white_around_sticker = T, #recortar el borde exterior del hex
+    
+    # ##Opciones de la URL
+    # url                  = "Data Science Solutions SAC", #lo que irá abajo          
+    # u_color              = uvic_black, #color de fuente
+    # u_size               = 7, #tamaño de fuente
+    # u_angle              = 30, #Ángulo de la URL
+    # u_x                  = 1, 
+    # u_y                  = 0.05, 
+    # u_family             = "roboto_slab", 
+    # 
+    # # Save file
+    filename             = "../images/ietsi-redcap.png"
+    
+  )  
+
+plot(ietsi_hex)
+```
+
+
+```{r}
+save_sticker("../images/ietsi-redcap-hex.png",
+             ietsi_hex,
+             dpi         = 600)
+```
+
+## Fondo transparente
+
+```{r}
+# Extrayendo fondo
+logo <- image_read("../images/ietsi-redcap-hex.png")
+
+logo %>% 
+  image_transparent('white') %>% 
+  image_write("../images/ietsi-redcap-hexsticker-transparent.png", "png")
+```
+
+```{r}
+plot(logo)
+```
